@@ -1,0 +1,39 @@
+# フロントエンド用Dockerfile
+
+# Node.jsの公式イメージをベースに使用
+FROM node:20-alpine
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# .env ファイルをコンテナにコピー
+COPY .env .env
+
+# 環境変数を読み込み
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+ENV NODE_ENV=development
+ENV WATCHPACK_POLLING=true
+
+# # 必要なパッケージをインストール
+# # GitHubの認証トークンを使って、npmパッケージをインストールできるように設定
+RUN echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" > .npmrc
+COPY ./services/frontend/.npmrc .npmrc
+
+# パッケージの依存関係をインストール
+COPY ./services/frontend/ffoffa/package.json ./services/frontend/ffoffa/package-lock.json ./
+RUN npm install
+RUN npm ci
+
+# ソースコードをコピー
+COPY ./services/frontend/ffoffa/ .
+
+# Next.js アプリケーションをビルド
+# RUN npm run build
+RUN rm -f .env .npmrc
+
+# Next.js を起動
+CMD ["npm", "run", "dev"]
+
+# ポート3000を公開
+EXPOSE 3000

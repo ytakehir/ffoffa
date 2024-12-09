@@ -1,0 +1,22 @@
+# バックエンド用Dockerfile
+
+# Python の公式イメージをベースに使用
+FROM python:3.12-alpine
+
+# curlをインストール
+RUN apk add --no-cache curl
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# 必要なパッケージをインストール
+COPY ./services/backend/lipAdviser/requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ソースコードをコピー
+COPY ./services/backend/lipAdviser/ .
+
+# アプリケーションを実行
+CMD ["python", "-m", "API.mainApp"]
+
+EXPOSE 5000

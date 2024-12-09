@@ -1,0 +1,117 @@
+services:
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    build:
+      context: .
+      dockerfile: ./services/database/mysql/Dockerfile
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    volumes:
+      - ./services/database/mysql/seed:/docker-entrypoint-initdb.d
+      - ./services/database/mysql/db:/var/lib/mysql
+    networks:
+      - app-network
+    restart: always
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "mysql",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8080:80
+    container_name: phpmyadmin
+    environment:
+      MYSQL_USERNAME: "${MYSQL_USERNAME}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      PMA_HOST: mysql
+    networks:
+      - app-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: always
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./services/backend/Dockerfile-dev
+    ports:
+      - "5000:5000"
+    container_name: backend
+    volumes:
+      - ./services/backend/lipAdviser:/app
+    networks:
+      - app-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/test"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./services/frontend/Dockerfile-dev
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    ports:
+      - "3000:3000"
+    container_name: frontend
+    volumes:
+      - ./services/frontend/ffoffa:/app
+    env_file:
+      - .env
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+    networks:
+      - app-network
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - "80:80"
+    container_name: nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

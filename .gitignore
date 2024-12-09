@@ -1,0 +1,5 @@
+.env
+services\backend\lipAdviser\*
+services\frontend\ffoffa\*
+services\database\mysql\db\*
+.npmrc

@@ -1,0 +1,44 @@
+# ビルド用ステージ
+FROM node:20-alpine AS builder
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# 必要なパッケージの依存関係をインストール
+# GitHubの認証トークンを使って、npmパッケージをインストールできるように設定
+COPY .env .env
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+
+COPY ./services/frontend/.npmrc .npmrc
+
+# パッケージの依存関係をインストール
+COPY ./services/frontend/ffoffa/package.json ./services/frontend/ffoffa/package-lock.json ./
+RUN npm install --frozen-lockfile
+
+# ソースコードをコピー
+COPY ./services/frontend/ffoffa/ .
+
+# Next.js アプリケーションをビルド
+RUN npm run build
+
+# ランタイム用ステージ
+FROM node:20-alpine
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# ビルド成果物と依存関係をコピー
+COPY --from=builder /app /app
+
+# 環境変数を設定
+ENV NODE_ENV=production
+
+# .env ファイルは不要なので削除
+RUN rm -f .env .npmrc
+
+# Next.js アプリケーションを起動
+CMD ["npm", "run", "start"]
+
+# ポート3000を公開
+EXPOSE 3000

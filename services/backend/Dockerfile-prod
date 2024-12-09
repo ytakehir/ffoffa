@@ -1,0 +1,33 @@
+# ビルドステージ（必要に応じて、依存関係のインストールのみ行う）
+FROM python:3.12-alpine AS builder
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# 必要なパッケージをインストール（curlは削除）
+COPY ./services/backend/lipAdviser/requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ソースコードをコピー
+COPY ./services/backend/lipAdviser/ .
+
+# 本番ステージ
+FROM python:3.12-alpine
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# ビルド成果物と依存関係をコピー
+COPY --from=builder /app /app
+
+# 不要なパッケージ（curlなど）を削除する
+RUN apk del curl
+
+# 本番用のアプリケーション実行コマンド
+RUN pip install gunicorn
+
+# gunicornでアプリケーションを起動（Flask用の場合）
+CMD ["gunicorn", "--workers=4", "--bind", "0.0.0.0:5000", "API.mainApp:app"]
+
+# ポート5000を公開
+EXPOSE 5000
