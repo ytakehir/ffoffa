@@ -1,4 +1,5 @@
 .env
-services\backend\lipAdviser\*
-services\frontend\ffoffa\*
-services\database\mysql\db\*
+/services/backend/lipAdviser/
+/services/frontend/ffoffa/
+/services/database/mysql/db/*
+/mysql/db/

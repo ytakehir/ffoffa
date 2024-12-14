@@ -18,5 +18,3 @@ COPY ./services/backend/lipAdviser/ .
 
 # アプリケーションを実行
 CMD ["python", "-m", "API.mainApp"]
-
-EXPOSE 5000

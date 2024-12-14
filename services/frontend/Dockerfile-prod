@@ -13,7 +13,7 @@ ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 COPY ./services/frontend/.npmrc .npmrc
 
 # パッケージの依存関係をインストール
-COPY ./services/frontend/ffoffa/package.json ./services/frontend/ffoffa/package-lock.json ./
+COPY ./services/frontend/ffoffa/package.json ./
 RUN npm install --frozen-lockfile
 
 # ソースコードをコピー
@@ -40,5 +40,3 @@ RUN rm -f .env .npmrc
 # Next.js アプリケーションを起動
 CMD ["npm", "run", "start"]
 
-# ポート3000を公開
-EXPOSE 3000

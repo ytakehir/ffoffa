@@ -21,8 +21,7 @@ RUN echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" > .npmrc
 COPY ./services/frontend/.npmrc .npmrc
 
 # パッケージの依存関係をインストール
-COPY ./services/frontend/ffoffa/package.json ./services/frontend/ffoffa/package-lock.json ./
-RUN npm install
+COPY ./services/frontend/ffoffa/package*.json ./
 RUN npm ci
 
 # ソースコードをコピー
@@ -33,7 +32,5 @@ COPY ./services/frontend/ffoffa/ .
 RUN rm -f .env .npmrc
 
 # Next.js を起動
-CMD ["npm", "run", "dev"]
+CMD ["npx", "next", "dev"]
 
-# ポート3000を公開
-EXPOSE 3000
