@@ -6,7 +6,6 @@ WORKDIR /app
 
 # 必要なパッケージの依存関係をインストール
 # GitHubの認証トークンを使って、npmパッケージをインストールできるように設定
-COPY .env .env
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 
@@ -35,7 +34,7 @@ COPY --from=builder /app /app
 ENV NODE_ENV=production
 
 # .env ファイルは不要なので削除
-RUN rm -f .env .npmrc
+RUN rm -f .npmrc
 
 # Next.js アプリケーションを起動
 CMD ["npm", "run", "start"]

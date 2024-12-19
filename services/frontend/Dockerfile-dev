@@ -6,9 +6,6 @@ FROM node:20-alpine
 # 作業ディレクトリを設定
 WORKDIR /app
 
-# .env ファイルをコンテナにコピー
-COPY .env .env
-
 # 環境変数を読み込み
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=${GITHUB_TOKEN}
@@ -29,8 +26,10 @@ COPY ./services/frontend/ffoffa/ .
 
 # Next.js アプリケーションをビルド
 # RUN npm run build
-RUN rm -f .env .npmrc
+RUN rm -f .npmrc
 
 # Next.js を起動
 CMD ["npx", "next", "dev"]
 
+# ポートの開放
+EXPOSE 3000
