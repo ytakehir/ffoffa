@@ -6,9 +6,10 @@ init:
 	docker compose build --no-cache
 
 ssl:
+	mkdir -p ./nginx/certs ./nginx/logs ./nginx/html
 	docker run --rm -it \
-  -v "/srv/nginx/certs:/etc/letsencrypt" \
-  -v "/srv/nginx/html:/var/www/certbot" \
+  -v "./nginx/certs:/etc/letsencrypt" \
+  -v "./nginx/html:/var/www/certbot" \
   certbot/certbot certonly \
   --webroot \
   --webroot-path=/var/www/certbot \
