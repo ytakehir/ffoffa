@@ -1,5 +1,4 @@
-# ビルド用ステージ
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 
 # 作業ディレクトリを設定
 WORKDIR /app
@@ -19,16 +18,7 @@ RUN npm install --frozen-lockfile
 COPY ./services/frontend/ffoffa/ .
 
 # Next.js アプリケーションをビルド
-RUN npm run build
-
-# ランタイム用ステージ
-FROM node:20-alpine
-
-# 作業ディレクトリを設定
-WORKDIR /app
-
-# ビルド成果物と依存関係をコピー
-COPY --from=builder /app /app
+RUN  npm run build
 
 # 環境変数を設定
 ENV NODE_ENV=production
@@ -38,4 +28,3 @@ RUN rm -f .npmrc
 
 # Next.js アプリケーションを起動
 CMD ["npm", "run", "start"]
-

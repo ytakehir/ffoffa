@@ -1,11 +1,13 @@
-# Pythonベースのイメージを使用
-FROM python:3.12-alpine
+# バックエンド用Dockerfile
 
-# 作業ディレクトリを設定
-WORKDIR /app
+# Python の公式イメージをベースに使用
+FROM python:3.12-alpine
 
 # curlをインストール
 RUN apk add --no-cache curl
+
+# 作業ディレクトリを設定
+WORKDIR /app
 
 # 必要なパッケージをインストール
 COPY ./services/backend/lipAdviser/requirements.txt /app/
@@ -14,8 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ソースコードをコピー
 COPY ./services/backend/lipAdviser/ .
 
-# gunicornでアプリケーションを起動
-CMD ["gunicorn", "API.mainApp:app", "--workers=4", "-b", "0.0.0.0:5000"]
+# アプリケーションを実行
+CMD ["python", "-m", "API.mainApp"]
 
 # ポートの開放
 EXPOSE 5000
