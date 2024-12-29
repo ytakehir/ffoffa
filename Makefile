@@ -3,7 +3,8 @@
 # 初期セットアップ
 init:
 	make clone
-	docker compose build --no-cache
+	sudo chmod -R 777 services/database/mysql/db
+	sudo chown -R 999:999 services/database/mysql/db
 
 ssl:
 	mkdir -p ./nginx/certs ./nginx/logs ./nginx/html
@@ -16,6 +17,7 @@ ssl:
   --agree-tos \
   --email infol@ffoffa.com \
   -d ffoffa.net -d www.ffoffa.net
+	chmod +x /srv/nginx/cert_renew.sh
 
 clone:
 	git clone git@github.com:ytakehir/ffoffa_lipAdviser_next.git ./services/frontend/ffoffa
