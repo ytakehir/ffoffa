@@ -3,6 +3,8 @@
 # 初期セットアップ
 init:
 	make clone
+
+init-db:
 	sudo chmod -R 777 services/database/mysql/db
 	sudo chown -R 999:999 services/database/mysql/db
 
