@@ -66,11 +66,13 @@ up-prod:
 
 # コンテナの停止
 down:
-	docker compose down
+	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
+	docker compose  --env-file .env.$(ENV) down
 
 # ログの確認
 logs:
-	docker compose logs -f
+	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
+	docker compose --env-file .env.$(ENV) logs -f
 
 clean:
 	rm -rf ./services/frontend/ffoffa
