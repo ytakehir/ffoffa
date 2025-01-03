@@ -36,7 +36,7 @@ define build_and_start
 	docker compose --env-file .env.$(ENV) up -d $1
 endef
 
-# 引数 ENV が必要
+# サービスのビルドと起動
 start:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
 	@echo "Using environment: $(ENV)"
@@ -56,18 +56,13 @@ start:
 
 # コンテナの起動
 up:
-	docker compose up -d
-
-up-dev:
-	docker compose --env-file .env.local up -d
-
-up-prod:
-	docker compose --env-file .env.prod up -d
+	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
+	docker compose --env-file .env.$(ENV) up -d
 
 # コンテナの停止
 down:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
-	docker compose  --env-file .env.$(ENV) down
+	docker compose --env-file .env.$(ENV) down
 
 # ログの確認
 logs:
