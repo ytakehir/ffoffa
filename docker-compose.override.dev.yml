@@ -1,0 +1,28 @@
+services:
+  mysql-dev:
+    ports:
+      - "3307:3307"
+    container_name: mysql-dev
+
+  phpmyadmin-dev:
+    ports:
+      - 8081:8081
+    container_name: phpmyadmin-dev
+
+  backend-dev:
+    ports:
+      - 5001:5001
+    container_name: backend-dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://backend-dev:5001/test"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+
+  frontend-dev:
+    ports:
+      - 3001:3001
+    container_name: frontend-dev
+
+  nginx:
+    container_name: nginx-dev

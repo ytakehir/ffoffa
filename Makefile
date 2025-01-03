@@ -31,9 +31,18 @@ build:
 # 擬似関数: サービスのビルドと起動
 define build_and_start
 	@echo "Building $1..."
-	docker compose --env-file .env.$(ENV) build --no-cache $1
+	# ENV変数に応じて設定を変更する
+	@if [ "$(ENV)" == "prod" ]; then \
+		docker compose -f docker-compose.yml --env-file .env.prod build $1; \
+	else \
+		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) build $1; \
+	fi
 	@echo "Starting $1..."
-	docker compose --env-file .env.$(ENV) up -d $1
+	@if [ "$(ENV)" == "prod" ]; then \
+		docker compose -f docker-compose.yml --env-file .env.prod up -d $1; \
+	else \
+		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) up -d $1; \
+	fi
 endef
 
 # サービスのビルドと起動
