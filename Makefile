@@ -31,7 +31,6 @@ build:
 # 擬似関数: サービスのビルドと起動
 define build_and_start
 	@echo "Building $1..."
-	# ENV変数に応じて設定を変更する
 	@if [ "$(ENV)" = "prod" ]; then \
 		docker compose -f docker-compose.yml --env-file .env.prod build $1; \
 	else \
