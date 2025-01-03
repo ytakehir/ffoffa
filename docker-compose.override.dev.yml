@@ -1,15 +1,15 @@
 services:
-  mysql-dev:
+  mysql:
     ports:
       - "3307:3307"
     container_name: mysql-dev
 
-  phpmyadmin-dev:
+  phpmyadmin:
     ports:
       - 8081:8081
     container_name: phpmyadmin-dev
 
-  backend-dev:
+  backend:
     ports:
       - 5001:5001
     container_name: backend-dev
@@ -19,7 +19,7 @@ services:
       timeout: 10s
       retries: 5
 
-  frontend-dev:
+  frontend:
     ports:
       - 3001:3001
     container_name: frontend-dev
