@@ -1,13 +1,17 @@
 services:
   mysql:
     ports:
-      - "3307:3307"
+      - "3307:3306"
     container_name: mysql-dev
+    environment:
+      - MYSQL_TCP_PORT=3307
 
   phpmyadmin:
     ports:
       - 8081:8081
     container_name: phpmyadmin-dev
+    environment:
+      - PMA_HOST=mysql_srv:3307
 
   backend:
     ports:

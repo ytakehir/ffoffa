@@ -51,15 +51,24 @@ start:
 	@echo "Building and starting backend mysql and backend..."
 	$(call build_and_start, mysql backend)
 	@echo "Waiting for backend to be ready..."
-	@until curl -s http://localhost:5000/test > /dev/null; do \
-		sleep 2; \
-		echo "Waiting..."; \
-	done
+	@if [ "$(ENV)" = "dev" ]; then \
+		echo "Waiting for backend to be ready..."; \
+		until curl -s http://localhost:5001/test > /dev/null; do \
+			sleep 2; \
+			echo "Waiting..."; \
+		done; \
+	else \
+		echo "Waiting for backend to be ready..."; \
+		until curl -s http://localhost:5000/test > /dev/null; do \
+			sleep 2; \
+			echo "Waiting..."; \
+		done; \
+	fi
 	@echo "Backend is ready!"
 	@echo "Building and starting frontend..."
 	$(call build_and_start, frontend)
-	@echo "Building and starting nginx and certbot..."
-	$(call build_and_start, nginx certbot)
+	@echo "Building and starting nginx."
+	$(call build_and_start, nginx)
 	@echo "All services are up and running!"
 
 # コンテナの起動
