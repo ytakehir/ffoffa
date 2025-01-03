@@ -20,4 +20,4 @@ COPY ./services/backend/lipAdviser/ .
 CMD ["python", "-m", "API.mainApp"]
 
 # ポートの開放
-EXPOSE 5000
+EXPOSE 5001

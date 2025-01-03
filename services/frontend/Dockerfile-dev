@@ -32,4 +32,4 @@ RUN rm -f .npmrc
 CMD ["npm", "run", "dev"]
 
 # ポートの開放
-EXPOSE 3000
+EXPOSE 3001

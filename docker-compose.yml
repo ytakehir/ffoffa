@@ -5,7 +5,7 @@ services:
       - "3306:3306"
     build:
       context: .
-      dockerfile: ./services/database/mysql/Dockerfile
+      dockerfile: ./services/database/mysql/Dockerfile-${ENV}
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
