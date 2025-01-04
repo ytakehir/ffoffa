@@ -7,6 +7,7 @@ WORKDIR /app
 # GitHubの認証トークンを使って、npmパッケージをインストールできるように設定
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+ENV PORT=3000
 
 COPY ./services/frontend/.npmrc .npmrc
 

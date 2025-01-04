@@ -1,8 +1,6 @@
 services:
   mysql:
     image: mysql:8.0
-    ports:
-      - "3306:3306"
     build:
       context: .
       dockerfile: ./services/database/mysql/Dockerfile-${ENV}
@@ -14,31 +12,13 @@ services:
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     volumes:
       - ./services/database/mysql/seed:/docker-entrypoint-initdb.d
-      - ./services/database/mysql/db:/var/lib/mysql
     user: 999:999
     networks:
       - app-network
     restart: always
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "mysql",
-          "-u",
-          "root",
-          "-p${MYSQL_ROOT_PASSWORD}",
-        ]
-      interval: 20s
-      timeout: 10s
-      retries: 3
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    ports:
-      - 8080:8080
     container_name: phpmyadmin
     environment:
       MYSQL_USERNAME: "${MYSQL_USERNAME}"
@@ -56,8 +36,6 @@ services:
       context: .
       dockerfile: ./services/backend/Dockerfile-${ENV}
     container_name: backend
-    ports:
-      - 5000:5000
     volumes:
       - ./services/backend/lipAdviser:/app
     networks:
@@ -66,11 +44,6 @@ services:
       mysql:
         condition: service_healthy
     restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://backend:5000/test"]
-      interval: 20s
-      timeout: 10s
-      retries: 5
 
   frontend:
     build:
@@ -79,8 +52,6 @@ services:
       args:
         - GITHUB_TOKEN=${GITHUB_TOKEN}
     container_name: frontend
-    ports:
-      - 3000:3000
     environment:
       GITHUB_TOKEN: ${GITHUB_TOKEN}
     networks:

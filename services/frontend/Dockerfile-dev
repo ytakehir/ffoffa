@@ -11,6 +11,7 @@ ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 ENV NODE_ENV=development
 ENV WATCHPACK_POLLING=true
+ENV PORT=3001
 
 # # 必要なパッケージをインストール
 # # GitHubの認証トークンを使って、npmパッケージをインストールできるように設定

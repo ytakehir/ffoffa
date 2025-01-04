@@ -1,4 +1,9 @@
 .env*
 /services/backend/lipAdviser/
 /services/frontend/ffoffa/
-/services/database/mysql/db/*
+/services/database/mysql/dev/**
+/services/database/mysql/prod/**
+!/services/database/mysql/dev/**/
+!/services/database/mysql/dev/**/.gitkeep
+!/services/database/mysql/prod/**/
+!/services/database/mysql/prod/**/.gitkeep

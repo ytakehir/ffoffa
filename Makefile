@@ -5,8 +5,10 @@ init:
 	make clone
 
 init-db:
-	sudo chmod -R 777 services/database/mysql/db
-	sudo chown -R 999:999 services/database/mysql/db
+	sudo chmod -R 777 ./services/database/mysql/dev/db
+	sudo chmod -R 777 ./services/database/mysql/prod/db
+	sudo chown -R 999:999 ./services/database/mysql/dev/db
+	sudo chown -R 999:999 ./services/database/mysql/prod/db
 
 ssl:
 	mkdir -p ./nginx/certs ./nginx/logs ./nginx/html
@@ -26,21 +28,22 @@ clone:
 	git clone git@github.com:ytakehir/ffoffa_LipAdviser_API.git ./services/backend/lipAdviser
 
 build:
-	docker compose build --no-cache
+	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
+	@echo "Using environment: $(ENV)"
+	@echo "Building $1..."
+	@if [ "$(ENV)" = "prod" ]; then \
+		docker compose -f docker-compose.yml -f docker-compose.override.prod.yml --env-file .env.prod -p ffoffa-$(ENV) build  --no-cache $1; \
+	else \
+		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) -p ffoffa-$(ENV) build  --no-cache $1; \
+	fi
 
 # 擬似関数: サービスのビルドと起動
 define build_and_start
-	@echo "Building $1..."
-	@if [ "$(ENV)" = "prod" ]; then \
-		docker compose -f docker-compose.yml --env-file .env.prod build $1; \
-	else \
-		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) build $1; \
-	fi
 	@echo "Starting $1..."
 	@if [ "$(ENV)" = "prod" ]; then \
-		docker compose -f docker-compose.yml --env-file .env.prod up -d $1; \
+		docker compose -f docker-compose.yml -f docker-compose.override.prod.yml --env-file .env.prod -p ffoffa-$(ENV) up -d $1; \
 	else \
-		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) up -d $1; \
+		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) -p ffoffa-$(ENV) up -d $1; \
 	fi
 endef
 
@@ -49,16 +52,14 @@ start:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
 	@echo "Using environment: $(ENV)"
 	@echo "Building and starting backend mysql and backend..."
-	$(call build_and_start, mysql backend)
+	$(call build_and_start, mysql phpmyadmin backend)
 	@echo "Waiting for backend to be ready..."
 	@if [ "$(ENV)" = "dev" ]; then \
-		echo "Waiting for backend to be ready..."; \
 		until curl -s http://localhost:5001/test > /dev/null; do \
 			sleep 2; \
 			echo "Waiting..."; \
 		done; \
 	else \
-		echo "Waiting for backend to be ready..."; \
 		until curl -s http://localhost:5000/test > /dev/null; do \
 			sleep 2; \
 			echo "Waiting..."; \
@@ -74,17 +75,17 @@ start:
 # コンテナの起動
 up:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
-	docker compose --env-file .env.$(ENV) up -d
+	docker compose --env-file .env.$(ENV) -p ffoffa-$(ENV) up -d
 
 # コンテナの停止
 down:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
-	docker compose --env-file .env.$(ENV) down
+	docker compose --env-file .env.$(ENV) -p ffoffa-$(ENV) down -v
 
 # ログの確認
 logs:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
-	docker compose --env-file .env.$(ENV) logs -f
+	docker compose --env-file .env.$(ENV) -p ffoffa-$(ENV) logs -f
 
 clean:
 	rm -rf ./services/frontend/ffoffa

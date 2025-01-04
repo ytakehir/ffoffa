@@ -1,12 +1,12 @@
 services:
   mysql:
     ports:
-      - "3307:3307"
-    container_name: mysql-dev
+      - "3306:3306"
+    container_name: mysql-prod
     environment:
-      - MYSQL_TCP_PORT=3307
+      - MYSQL_TCP_PORT=3306
     volumes:
-      - ./services/database/mysql/dev/db:/var/lib/mysql
+      - ./services/database/mysql/prod/db:/var/lib/mysql
     healthcheck:
       test:
         [
@@ -14,7 +14,7 @@ services:
           "mysqladmin",
           "ping",
           "-h",
-          "mysql-dev",
+          "mysql-prod",
           "-u",
           "root",
           "-p${MYSQL_ROOT_PASSWORD}",
@@ -25,25 +25,25 @@ services:
 
   phpmyadmin:
     ports:
-      - 8081:8081
-    container_name: phpmyadmin-dev
+      - 8080:8080
+    container_name: phpmyadmin-prod
     environment:
-      - PMA_HOST=mysql_srv:3307
+      - PMA_HOST=mysql_srv:3306
 
   backend:
     ports:
-      - 5001:5001
-    container_name: backend-dev
+      - 5000:5000
+    container_name: backend-prod
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://backend-dev:5001/test"]
+      test: ["CMD", "curl", "-f", "http://backend-prod:5000/test"]
       interval: 20s
       timeout: 10s
       retries: 5
 
   frontend:
     ports:
-      - 3001:3001
-    container_name: frontend-dev
+      - 3000:3000
+    container_name: frontend-prod
 
   nginx:
-    container_name: nginx-dev
+    container_name: nginx-prod
