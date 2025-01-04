@@ -3,7 +3,6 @@
 # 初期セットアップ
 init:
 	make clone
-	make init-db
 
 init-db:
 	sudo chmod -R 777 ./services/database/mysql/dev/db
@@ -28,17 +27,17 @@ clone:
 	git clone git@github.com:ytakehir/ffoffa_lipAdviser_next.git ./services/frontend/ffoffa
 	git clone git@github.com:ytakehir/ffoffa_LipAdviser_API.git ./services/backend/lipAdviser
 
-# 擬似関数: サービスのビルド
-define build
+build:
+	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
+	@echo "Using environment: $(ENV)"
 	@echo "Building $1..."
 	@if [ "$(ENV)" = "prod" ]; then \
 		docker compose -f docker-compose.yml -f docker-compose.override.prod.yml --env-file .env.prod -p ffoffa-$(ENV) build  --no-cache $1; \
 	else \
 		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) -p ffoffa-$(ENV) build  --no-cache $1; \
 	fi
-endef
 
-# 擬似関数: サービスの起動
+# 擬似関数: サービスのビルドと起動
 define start
 	@echo "Starting $1..."
 	@if [ "$(ENV)" = "prod" ]; then \
@@ -48,36 +47,11 @@ define start
 	fi
 endef
 
-# サービスのビルド
-build:
-	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
-	@echo "Using environment: $(ENV)"
-	@echo "Building mysql phpmyadmin and backend..."
-	$(call build, mysql phpmyadmin backend)
-	@echo "Waiting for backend to be ready..."
-	@if [ "$(ENV)" = "dev" ]; then \
-		until curl -s http://localhost:5001/test > /dev/null; do \
-			sleep 2; \
-			echo "Waiting..."; \
-		done; \
-	else \
-		until curl -s http://localhost:5000/test > /dev/null; do \
-			sleep 2; \
-			echo "Waiting..."; \
-		done; \
-	fi
-	@echo "Backend is ready!"
-	@echo "Building frontend..."
-	$(call build, frontend)
-	@echo "Building nginx."
-	$(call build, nginx)
-	@echo "All services are up and building!"
-
-# サービスの起動
+# サービスのビルドと起動
 start:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
 	@echo "Using environment: $(ENV)"
-	@echo "Starting mysql phpmyadmin and backend..."
+	@echo "Building and starting backend mysql and backend..."
 	$(call start, mysql phpmyadmin backend)
 	@echo "Waiting for backend to be ready..."
 	@if [ "$(ENV)" = "dev" ]; then \
@@ -92,9 +66,9 @@ start:
 		done; \
 	fi
 	@echo "Backend is ready!"
-	@echo "Starting frontend..."
+	@echo "Building and starting frontend..."
 	$(call start, frontend)
-	@echo "Starting nginx."
+	@echo "Building and starting nginx."
 	$(call start, nginx)
 	@echo "All services are up and running!"
 
