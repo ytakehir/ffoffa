@@ -28,7 +28,7 @@ services:
       - 8081:8081
     container_name: phpmyadmin-dev
     environment:
-      - PMA_HOST=mysql_srv:3307
+      - PMA_HOST=mysql-dev:3307
 
   backend:
     ports:

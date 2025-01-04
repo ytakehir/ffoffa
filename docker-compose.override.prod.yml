@@ -28,7 +28,7 @@ services:
       - 8080:8080
     container_name: phpmyadmin-prod
     environment:
-      - PMA_HOST=mysql_srv:3306
+      - PMA_HOST=mysql-prod:3306
 
   backend:
     ports:

@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.1
     build:
       context: .
       dockerfile: ./services/database/mysql/Dockerfile-${ENV}
