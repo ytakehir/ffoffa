@@ -3,6 +3,7 @@
 # 初期セットアップ
 init:
 	make clone
+	make init-db
 
 init-db:
 	sudo chmod -R 777 ./services/database/mysql/dev/db
@@ -27,18 +28,18 @@ clone:
 	git clone git@github.com:ytakehir/ffoffa_lipAdviser_next.git ./services/frontend/ffoffa
 	git clone git@github.com:ytakehir/ffoffa_LipAdviser_API.git ./services/backend/lipAdviser
 
-build:
-	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
-	@echo "Using environment: $(ENV)"
+# 擬似関数: サービスのビルド
+define build
 	@echo "Building $1..."
 	@if [ "$(ENV)" = "prod" ]; then \
 		docker compose -f docker-compose.yml -f docker-compose.override.prod.yml --env-file .env.prod -p ffoffa-$(ENV) build  --no-cache $1; \
 	else \
 		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) -p ffoffa-$(ENV) build  --no-cache $1; \
 	fi
+endef
 
-# 擬似関数: サービスのビルドと起動
-define build_and_start
+# 擬似関数: サービスの起動
+define start
 	@echo "Starting $1..."
 	@if [ "$(ENV)" = "prod" ]; then \
 		docker compose -f docker-compose.yml -f docker-compose.override.prod.yml --env-file .env.prod -p ffoffa-$(ENV) up -d $1; \
@@ -47,12 +48,12 @@ define build_and_start
 	fi
 endef
 
-# サービスのビルドと起動
+# サービスのビルド
 start:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
 	@echo "Using environment: $(ENV)"
-	@echo "Building and starting backend mysql and backend..."
-	$(call build_and_start, mysql phpmyadmin backend)
+	@echo "Building mysql phpmyadmin and backend..."
+	$(call build, mysql phpmyadmin backend)
 	@echo "Waiting for backend to be ready..."
 	@if [ "$(ENV)" = "dev" ]; then \
 		until curl -s http://localhost:5001/test > /dev/null; do \
@@ -66,10 +67,35 @@ start:
 		done; \
 	fi
 	@echo "Backend is ready!"
-	@echo "Building and starting frontend..."
-	$(call build_and_start, frontend)
-	@echo "Building and starting nginx."
-	$(call build_and_start, nginx)
+	@echo "Building frontend..."
+	$(call build, frontend)
+	@echo "Building nginx."
+	$(call build, nginx)
+	@echo "All services are up and building!"
+
+# サービスの起動
+start:
+	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
+	@echo "Using environment: $(ENV)"
+	@echo "Starting mysql phpmyadmin and backend..."
+	$(call start, mysql phpmyadmin backend)
+	@echo "Waiting for backend to be ready..."
+	@if [ "$(ENV)" = "dev" ]; then \
+		until curl -s http://localhost:5001/test > /dev/null; do \
+			sleep 2; \
+			echo "Waiting..."; \
+		done; \
+	else \
+		until curl -s http://localhost:5000/test > /dev/null; do \
+			sleep 2; \
+			echo "Waiting..."; \
+		done; \
+	fi
+	@echo "Backend is ready!"
+	@echo "Starting frontend..."
+	$(call start, frontend)
+	@echo "Starting nginx."
+	$(call start, nginx)
 	@echo "All services are up and running!"
 
 # コンテナの起動
