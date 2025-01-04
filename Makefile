@@ -49,7 +49,7 @@ define start
 endef
 
 # サービスのビルド
-start:
+build:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
 	@echo "Using environment: $(ENV)"
 	@echo "Building mysql phpmyadmin and backend..."
