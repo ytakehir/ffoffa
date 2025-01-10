@@ -3,10 +3,9 @@ services:
     ports:
       - "3306:3306"
     container_name: mysql-prod
-    environment:
-      - MYSQL_TCP_PORT=3306
     volumes:
       - ./services/database/mysql/prod/db:/var/lib/mysql
+      - ./services/database/mysql/prod/config/my.cnf:/etc/mysql/my.cnf
     healthcheck:
       test:
         [
