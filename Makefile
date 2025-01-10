@@ -3,12 +3,13 @@
 # 初期セットアップ
 init:
 	make clone
+	make init-db
 
 init-db:
-	sudo chmod -R 777 ./services/database/mysql/dev/db
-	sudo chmod -R 777 ./services/database/mysql/prod/db
-	sudo chown -R 999:999 ./services/database/mysql/dev/db
-	sudo chown -R 999:999 ./services/database/mysql/prod/db
+	sudo chmod -R 777 services/database/mysql/dev/**
+	sudo chmod -R 777 services/database/mysql/prod/**
+	sudo chown -R 999:999 services/database/mysql/dev/**
+	sudo chown -R 999:999 services/database/mysql/prod/**
 
 ssl:
 	mkdir -p ./nginx/certs ./nginx/logs ./nginx/html
