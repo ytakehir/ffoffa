@@ -1,10 +1,10 @@
 services:
   mysql:
     ports:
-      - "3307:3306"
-    container_name: mysql-dev
+      - "3306:3306"
+    container_name: mysql-local
     volumes:
-      - ./services/database/mysql/dev/db:/var/lib/mysql
+      - ./services/database/mysql/local/db:/var/lib/mysql
     healthcheck:
       test:
         [
@@ -12,7 +12,7 @@ services:
           "mysqladmin",
           "ping",
           "-h",
-          "mysql-dev",
+          "mysql-local",
           "-u",
           "root",
           "-p${MYSQL_ROOT_PASSWORD}",
@@ -23,18 +23,18 @@ services:
 
   backend:
     ports:
-      - 5001:5001
-    container_name: backend-dev
+      - 5000:5000
+    container_name: backend-local
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://backend-dev:5001/test"]
+      test: ["CMD", "curl", "-f", "http://backend-local:5000/test"]
       interval: 20s
       timeout: 10s
       retries: 5
 
   frontend:
     ports:
-      - 3001:3001
-    container_name: frontend-dev
+      - 3000:3000
+    container_name: frontend-local
 
   nginx:
-    container_name: nginx-dev
+    container_name: nginx-local

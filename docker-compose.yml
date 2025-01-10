@@ -17,20 +17,6 @@ services:
       - app-network
     restart: always
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    environment:
-      MYSQL_USERNAME: "${MYSQL_USERNAME}"
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      PMA_HOST: mysql
-    networks:
-      - app-network
-    depends_on:
-      mysql:
-        condition: service_healthy
-    restart: always
-
   backend:
     build:
       context: .

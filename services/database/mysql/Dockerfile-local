@@ -11,4 +11,4 @@ COPY ./services/database/mysql/seed /docker-entrypoint-initdb.d/
 CMD ["mysqld"]
 
 # ポートの開放
-EXPOSE 3307
+EXPOSE 3306

@@ -8,8 +8,10 @@ init:
 init-db:
 	sudo chmod -R 777 services/database/mysql/dev/**
 	sudo chmod -R 777 services/database/mysql/prod/**
+	sudo chmod -R 777 services/database/mysql/local/**
 	sudo chown -R 999:999 services/database/mysql/dev/**
 	sudo chown -R 999:999 services/database/mysql/prod/**
+	sudo chown -R 999:999 services/database/mysql/local/**
 
 ssl:
 	mkdir -p ./nginx/certs ./nginx/logs ./nginx/html
@@ -32,20 +34,12 @@ build:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
 	@echo "Using environment: $(ENV)"
 	@echo "Building $1..."
-	@if [ "$(ENV)" = "prod" ]; then \
-		docker compose -f docker-compose.yml -f docker-compose.override.prod.yml --env-file .env.prod -p ffoffa-$(ENV) build  --no-cache $1; \
-	else \
-		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) -p ffoffa-$(ENV) build  --no-cache $1; \
-	fi
+	docker compose -f docker-compose.yml -f docker-compose.override.$(ENV).yml --env-file .env.$(ENV) -p ffoffa-$(ENV) build  --no-cache $1;
 
 # 擬似関数: サービスのビルドと起動
 define start
 	@echo "Starting $1..."
-	@if [ "$(ENV)" = "prod" ]; then \
-		docker compose -f docker-compose.yml -f docker-compose.override.prod.yml --env-file .env.prod -p ffoffa-$(ENV) up -d $1; \
-	else \
-		docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --env-file .env.$(ENV) -p ffoffa-$(ENV) up -d $1; \
-	fi
+	docker compose -f docker-compose.yml -f docker-compose.override.$(ENV).yml --env-file .env.$(ENV) -p ffoffa-$(ENV) up -d $1;
 endef
 
 # サービスのビルドと起動
@@ -53,7 +47,7 @@ start:
 	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
 	@echo "Using environment: $(ENV)"
 	@echo "Building and starting backend mysql and backend..."
-	$(call start, mysql phpmyadmin backend)
+	$(call start, mysql backend)
 	@echo "Waiting for backend to be ready..."
 	@if [ "$(ENV)" = "dev" ]; then \
 		until curl -s http://localhost:5001/test > /dev/null; do \
