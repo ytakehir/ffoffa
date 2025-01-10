@@ -1,11 +1,10 @@
 services:
   mysql:
     ports:
-      - "3307:3307"
+      - "3307:3306"
     container_name: mysql-dev
     volumes:
       - ./services/database/mysql/dev/db:/var/lib/mysql
-      - ./services/database/mysql/dev/config/my.cnf:/etc/mysql/my.cnf
     healthcheck:
       test:
         [

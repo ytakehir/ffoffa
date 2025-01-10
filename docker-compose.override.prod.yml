@@ -5,7 +5,6 @@ services:
     container_name: mysql-prod
     volumes:
       - ./services/database/mysql/prod/db:/var/lib/mysql
-      - ./services/database/mysql/prod/config/my.cnf:/etc/mysql/my.cnf
     healthcheck:
       test:
         [
