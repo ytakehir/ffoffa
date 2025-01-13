@@ -30,17 +30,29 @@ clone:
 	git clone git@github.com:ytakehir/ffoffa_lipAdviser_next.git ./services/frontend/ffoffa
 	git clone git@github.com:ytakehir/ffoffa_LipAdviser_API.git ./services/backend/lipAdviser
 
-build:
-	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
-	@echo "Using environment: $(ENV)"
+# 擬似関数: サービスのビルド
+define build
 	@echo "Building $1..."
 	docker compose -f docker-compose.yml -f docker-compose.override.$(ENV).yml --env-file .env.$(ENV) -p ffoffa-$(ENV) build  --no-cache $1;
+endef
 
 # 擬似関数: サービスのビルドと起動
 define start
 	@echo "Starting $1..."
 	docker compose -f docker-compose.yml -f docker-compose.override.$(ENV).yml --env-file .env.$(ENV) -p ffoffa-$(ENV) up -d $1;
 endef
+
+# サービスのビルドと起動
+build:
+	@if [ -z "$(ENV)" ]; then echo "Usage: make start ENV=<env>"; exit 1; fi
+	@echo "Using environment: $(ENV)"
+	@echo "Building backend mysql and backend..."
+	$(call build, mysql backend)
+	@echo "Building frontend..."
+	$(call build, frontend)
+	@echo "Building nginx."
+	$(call build, nginx)
+	@echo "All services are up and building!"
 
 # サービスのビルドと起動
 start:

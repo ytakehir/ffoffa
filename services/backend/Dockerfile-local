@@ -1,17 +1,30 @@
 # バックエンド用Dockerfile
 
 # Python の公式イメージをベースに使用
-FROM python:3.12-alpine
+FROM python:3.12-slim
 
-# curlをインストール
-RUN apk add --no-cache curl
+# 必要なパッケージをインストール
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gcc \
+    g++ \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpng-dev \
+    libtiff-dev \
+    libgl1-mesa-glx \
+    libopencv-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 
 # 作業ディレクトリを設定
 WORKDIR /app
 
 # 必要なパッケージをインストール
 COPY ./services/backend/lipAdviser/requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # ソースコードをコピー
 COPY ./services/backend/lipAdviser/ .
@@ -21,7 +34,7 @@ ENV FLASK_APP=API.mainApp
 ENV FLASK_RUN_PORT=5000
 
 # Flaskアプリケーションを実行
-CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5000", "--debug"]
 
 # ポートの開放
 EXPOSE 5000
