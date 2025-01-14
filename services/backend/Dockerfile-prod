@@ -22,6 +22,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 
 # 必要なパッケージをインストール
 COPY ./services/backend/lipAdviser/requirements.txt /app/
+RUN python3 -m pip install gunicorn
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # ソースコードをコピー
